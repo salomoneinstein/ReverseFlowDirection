@@ -25,7 +25,7 @@ from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
 from qgis.gui import QgsMapToolEmitPoint, QgsMapLayerComboBox, QgsFieldComboBox
-from qgis.core import QgsMapLayerProxyModel, QgsFieldProxyModel, QgsGeometry, edit
+from qgis.core import QgsMapLayerProxyModel, QgsFieldProxyModel, QgsGeometry, QgsArrowSymbolLayer, QgsSingleSymbolRenderer, edit
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -196,9 +196,10 @@ class ReverseFlow:
             self.first_start = False
             self.dlg = ReverseFlowDialog()
             #slots and signals
-            self.dlg.btnClear.clicked.connect(self.btnClear_clicked)
-            self.dlg.btnExit.clicked.connect(self.btnExit_clicked)
+            self.dlg.btnClear.clicked.connect(self.clearDlg)
+            self.dlg.btnExit.clicked.connect(self.closeDlg)
             self.dlg.cbxLayers.layerChanged.connect(self.loadFields)
+            self.dlg.btnChangeSymbol.clicked.connect(self.changeSymbol)            
 
         # show the dialog
         self.dlg.show()
@@ -218,6 +219,19 @@ class ReverseFlow:
         """Load fields from a selected Layer"""
         self.lyr = self.dlg.cbxLayers.currentLayer()
         self.dlg.cbxFields.setLayer(self.lyr)
+
+    
+    def changeSymbol(self):
+        """Change symbology from seleted layer"""
+        if isinstance(self.lyr.renderer(),QgsSingleSymbolRenderer) == True:
+            symbLyr = QgsArrowSymbolLayer()
+            symbLyr.setIsCurved(False)
+            symbLyr.setIsRepeated(True)
+            self.lyr.renderer().symbol().changeSymbolLayer(0, symbLyr)
+            self.lyr.triggerRepaint()
+            self.iface.layerTreeView().refreshLayerSymbology(self.lyr.id())
+        else:
+            QMessageBox.warning(None,"Can't change symbology","The layer must be single symbol")
 
         
     def changeFlow(self, point, button):	
@@ -259,8 +273,8 @@ class ReverseFlow:
                         self.cLyr.triggerRepaint()                    
 
 
-    def btnClear_clicked(self):
-        """Clear field's results"""
+    def clearDlg(self):
+        """Clear results"""
         if not self.cLyr:
             QMessageBox.critical(None,"Missing layer","You must select a layer")
         else:			
@@ -270,6 +284,6 @@ class ReverseFlow:
             self.cLyr.removeSelection()
 
 
-    def btnExit_clicked(self):
+    def closeDlg(self):
         """Exit from plugin"""
         self.dlg.close()

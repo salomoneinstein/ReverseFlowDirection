@@ -6,7 +6,7 @@
 name=Reverse Flow Direction
 qgisMinimumVersion=3.0
 description=This Plugin changes the direction of a polyline feature.
-version=0.1
+version=0.2
 author=Salomón Einstein
 email=seramirezf@correo.udistrital.edu.co
 

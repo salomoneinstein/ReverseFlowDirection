@@ -223,6 +223,19 @@
     <string>Clear</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="btnChangeSymbol">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>260</y>
+     <width>111</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Change symbol</string>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
